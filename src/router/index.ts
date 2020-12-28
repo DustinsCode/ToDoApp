@@ -1,8 +1,8 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
-import {auth} from '../../firebaseconf'
+import { auth } from "../../firebaseconf";
 import Home from "../views/Home.vue";
-import Login from "../components/Login.vue"
+import Login from "../components/Login.vue";
 
 Vue.use(VueRouter);
 
@@ -10,7 +10,7 @@ const routes: Array<RouteConfig> = [
   {
     path: "/",
     name: "Home",
-    component: Home,
+    component: Login,
     meta: {
       requiresAuth: true
     }
@@ -38,8 +38,8 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(x => x.meta.requiresAuth);
 
-  if (requiresAuth && !auth.currentUser){
-    next('/login');
+  if (requiresAuth && !auth.currentUser) {
+    next("/login");
   } else {
     next();
   }
