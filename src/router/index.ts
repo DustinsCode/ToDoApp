@@ -2,7 +2,8 @@ import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
 import { auth } from "../../firebaseconf";
 import Home from "../views/Home.vue";
-import Login from "../components/Login.vue";
+import Login from "../components/Authentication/Login.vue";
+import AuthPage from "../components/Authentication/Authpage.vue";
 
 Vue.use(VueRouter);
 
@@ -10,7 +11,7 @@ const routes: Array<RouteConfig> = [
   {
     path: "/",
     name: "Home",
-    component: Login,
+    component: Home,
     meta: {
       requiresAuth: true
     }
@@ -27,7 +28,7 @@ const routes: Array<RouteConfig> = [
   {
     path: "/login",
     name: "Login",
-    component: Login
+    component: AuthPage
   }
 ];
 

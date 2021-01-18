@@ -42,7 +42,7 @@
 <script lang="ts">
 import Vue from "vue";
 import HelloWorld from "./components/HelloWorld.vue";
-import Login from "./components/Login.vue";
+import Login from "./components/Authentication/Login.vue";
 import router from "./router";
 
 export default Vue.extend({

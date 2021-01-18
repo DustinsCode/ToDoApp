@@ -3,10 +3,18 @@ import App from "./App.vue";
 import router from "./router";
 import store from "./store";
 import vuetify from "./plugins/vuetify";
+import Vuetify from "vuetify";
 import { auth } from "firebaseconf";
 import "./assets/SCSS/app.scss";
+import Login from "./components/Authentication/Login.vue";
+import CreateAccount from "./components/Authentication/CreateAccount.vue";
 
 Vue.config.productionTip = false;
+
+Vue.component("login", Login);
+Vue.component("create-account", CreateAccount)
+
+Vue.use(Vuetify);
 
 new Vue({
   router,
