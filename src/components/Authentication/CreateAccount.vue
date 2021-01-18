@@ -1,39 +1,42 @@
 <template>
-    <div>
+    <div class="signup-form">
         <h1>Create Account</h1>
-
-        <v-form
-            ref="form"
-            v-model="form.valid"
-        >
-            <v-text-field
-                v-model="form.fields.firstName"
-                label="First Name"
-                :counter="15"
-                :rules="form.rules.firstName"
-                required
+        <div>
+            <v-form
+                ref="form"
+                v-model="form.valid"
             >
-            </v-text-field>
+                <v-text-field
+                    v-model="form.fields.firstName"
+                    label="First Name"
+                    :counter="15"
+                    :rules="form.rules.firstName"
+                    autofocus
+                >
+                </v-text-field>
 
-            <v-text-field
-                v-model="form.fields.email"
-                :rules="form.rules.email"
-                label="Email"
-                required
-            >
-            </v-text-field>
+                <v-text-field
+                    ref="emailField"
+                    v-model="form.fields.email"
+                    :rules="form.rules.email"
+                    label="Email"
+                >
+                </v-text-field>
 
-            <v-text-field
-                v-model="form.fields.password"
-                :rules="form.rules.password"
-                label="Password"
-                required
-            >
-            </v-text-field>
+                <v-text-field
+                    v-model="form.fields.password"
+                    :rules="form.rules.password"
+                    :type="'password'"
+                    label="Password"
+                    hint="At least 8 characters"
+                    counter
+                >
+                </v-text-field>
 
-            <v-btn color="success">Sign Up</v-btn>
+                <v-btn color="success" @click="signUp" :disabled="!form.valid">Sign Up</v-btn>
 
-        </v-form>
+            </v-form>
+        </div>
 
     </div>
     
@@ -43,7 +46,7 @@
 import {Component, Vue} from 'vue-property-decorator';
 import firebase from 'firebase';
 import {FormDefinition} from '../../interfaces';
-import {requiredRule} from '../../form-rules';
+import {requiredRule, emailFormatRule, minPasswordLength} from '../../form-rules';
 
 interface SignupForm extends FormDefinition {
     fields: {
@@ -64,6 +67,7 @@ export default class CreateAccount extends Vue {
 
     form: SignupForm = {
         valid: true,
+        errors: [],
         fields: {
             email: '',
             firstName: '',
@@ -71,21 +75,50 @@ export default class CreateAccount extends Vue {
         },
         rules: {
             email: [
-                requiredRule()
+                requiredRule(),
+                emailFormatRule()
             ],
             firstName: [
                 requiredRule()
             ],
             password: [
-                requiredRule()
+                requiredRule(),
+                minPasswordLength()
             ]
         }
     }
 
-    //TODO: create signup function
+    $refs!: {
+        emailField: HTMLFormElement;
+    }
+    
+    signUp(){
+        firebase.auth().createUserWithEmailAndPassword(this.form.fields.email, this.form.fields.password)
+            .then((user) => {
+                // user signed in
+                console.log(user);
+                //redirect to home page
+                
+            })
+            .catch((error) => {
+                var errorMessage = error.message;
+                console.log("Error: " + errorMessage);
+                this.form.errors.push(errorMessage);
+                this.form.valid = false; 
+                this.emailErrorCheckAfterSubmit();
+            });
+    }
 
-    //TODO: on successful signup, initialize user's entry in database
-
+    emailErrorCheckAfterSubmit(){
+        this.form.errors.push('test');
+        this.form.errors.forEach(error => {
+            if(error.toLowerCase().includes('email')){
+                this.$refs.emailField.errorBucket.push(error);
+            }else{
+                alert("We had a problem signing you in. Since this app is currently in development, please email the following error message to dthurston1996@gmail.com: \n\n " + error);
+            }
+        });
+    }
 
 
 }
