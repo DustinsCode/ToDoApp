@@ -95,10 +95,9 @@ export default class CreateAccount extends Vue {
     signUp(){
         firebase.auth().createUserWithEmailAndPassword(this.form.fields.email, this.form.fields.password)
             .then((user) => {
-                // user signed in
-                console.log(user);
-                //redirect to home page
                 
+                //redirect to home page
+                this.$router.push('/');
             })
             .catch((error) => {
                 var errorMessage = error.message;
@@ -110,7 +109,6 @@ export default class CreateAccount extends Vue {
     }
 
     emailErrorCheckAfterSubmit(){
-        this.form.errors.push('test');
         this.form.errors.forEach(error => {
             if(error.toLowerCase().includes('email')){
                 this.$refs.emailField.errorBucket.push(error);

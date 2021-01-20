@@ -1,38 +1,95 @@
 <template>
-    <div>
-        <form @submit.prevent>
-            <h1>Welcome Back</h1>
-            <div>
-                <label for="email1">Email</label>
-                <input v-model.trim="loginForm.email" type="text" placeholder="you@email.com" id="email" />
-            </div>
-            <div>
-                <label for="password1">Password</label>
-                <input v-model.trim="loginForm.password" type="password" placeholder="******" id="password"/>
-            </div>
-            <button @click="login()">Log In</button>
-            <div >
-                <a>Forgot Password</a> |
-                <a>Create an Account</a>
-            </div>
-        </form>
+    <div class="login-form">
+        <h1>Welcome Back!</h1>
+        <div>
+            <v-form
+                ref="form"
+                v-model="form.valid"
+            >
+
+                <v-text-field
+                    ref="emailField"
+                    v-model="form.fields.email"
+                    :rules="form.rules.email"
+                    label="Email"
+                    autofocus
+                >
+                </v-text-field>
+
+                <v-text-field
+                    ref="passwordField"
+                    v-model="form.fields.password"
+                    :rules="form.rules.password"
+                    :type="'password'"
+                    label="Password"
+                >
+                </v-text-field>
+
+                <v-btn color="success" @click="login" :disabled="!form.valid">Sign In</v-btn>
+
+            </v-form>
+        </div>
     </div>
 </template>
 
 <script lang="ts">
+import { emailFormatRule, requiredRule } from '@/form-rules';
+import { FormDefinition } from '@/interfaces';
 import {Component, Vue} from 'vue-property-decorator'
+import firebase from 'firebase';
+
+interface LoginForm extends FormDefinition {
+    fields: {
+        email: string;
+        password: string;
+    },
+    rules: {
+        email: ((message?: string) => {})[];
+        password: ((message?: string) => {})[];
+    }
+}
+
 @Component
 export default class Login extends Vue {
-    loginForm: any = {
-        email: '',
-        password: ''
+    form: LoginForm = {
+        valid: true,
+        errors: [],
+        fields: {
+            email: '',
+            password: ''
+        },
+        rules: {
+            email: [
+                requiredRule(),
+                emailFormatRule()
+            ],
+            password: [
+                requiredRule()
+            ]
+        }
     }
 
+    $refs!: {
+        emailField: HTMLFormElement;
+        passwordField: HTMLFormElement;
+    }
+
+    //TODO: check if user logged in during init lifecycle hook
+
     login(){
-        this.$store.dispatch('login', {
-            email: this.loginForm.email,
-            password: this.loginForm.password
-        })
+        firebase.auth().signInWithEmailAndPassword(this.form.fields.email, this.form.fields.password)
+            .then((user) => {
+                //redirect to home page
+                this.$router.push('/');
+            })
+            .catch((error) => {
+                var errorMessage = error.message;
+                if(errorMessage.toLowerCase().includes('no user record')){
+                    this.$refs.emailField.errorBucket.push('We couldn\'t find an account with that email');
+                }else if(errorMessage.toLowerCase().includes('password is invalid')){
+                    this.$refs.passwordField.errorBucket.push('Invalid password');
+                }
+            })
     }
 }
 </script>
