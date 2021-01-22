@@ -8,6 +8,7 @@
             >
 
                 <v-text-field
+                    id="emailField"
                     ref="emailField"
                     v-model="form.fields.email"
                     :rules="form.rules.email"
@@ -25,7 +26,11 @@
                 >
                 </v-text-field>
 
-                <v-btn color="success" @click="login" :disabled="!form.valid">Sign In</v-btn>
+                <v-btn
+                    color="success" 
+                    @click="login" 
+                    :disabled="!form.valid"
+                >Sign In</v-btn>
 
             </v-form>
         </div>
@@ -35,8 +40,9 @@
 <script lang="ts">
 import { emailFormatRule, requiredRule } from '@/form-rules';
 import { FormDefinition } from '@/interfaces';
-import {Component, Vue} from 'vue-property-decorator'
+import {Component, Vue, Prop} from 'vue-property-decorator'
 import firebase from 'firebase';
+import FirebaseAuth from '@/components/Authentication/firebaseauth.service'
 
 interface LoginForm extends FormDefinition {
     fields: {
@@ -74,10 +80,16 @@ export default class Login extends Vue {
         passwordField: HTMLFormElement;
     }
 
+    firebaseAuthService!: FirebaseAuth;
+
+    mounted() {
+        this.firebaseAuthService = new FirebaseAuth();
+    }
+
     //TODO: check if user logged in during init lifecycle hook
 
     login(){
-        firebase.auth().signInWithEmailAndPassword(this.form.fields.email, this.form.fields.password)
+        this.firebaseAuthService.signIn(this.form.fields.email, this.form.fields.password)
             .then((user) => {
                 //redirect to home page
                 this.$router.push('/');
@@ -89,7 +101,7 @@ export default class Login extends Vue {
                 }else if(errorMessage.toLowerCase().includes('password is invalid')){
                     this.$refs.passwordField.errorBucket.push('Invalid password');
                 }
-            })
+            });
     }
 }
 </script>
