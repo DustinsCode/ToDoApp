@@ -18,7 +18,7 @@ Vue.use(Vuetify);
 
 let app: Vue;
 auth.onAuthStateChanged(() => {
-  if(!app) {
+  if (!app) {
     app = new Vue({
       router,
       store,
@@ -26,5 +26,4 @@ auth.onAuthStateChanged(() => {
       render: h => h(App)
     }).$mount("#app");
   }
-})
-
+});

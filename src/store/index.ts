@@ -13,14 +13,13 @@ export default new Vuex.Store({
   actions: {
     async login({ dispatch }, form) {
       //sign user in
-      const { user } = await fb.default.auth().signInWithEmailAndPassword(
-        form.email,
-        form.password
-      );
+      const { user } = await fb.default
+        .auth()
+        .signInWithEmailAndPassword(form.email, form.password);
 
       // fetch user profile and set in state
       // dispatch("fetchUserProfile", user);
-    },
+    }
     // async fetchUserProfile({ commit }, user) {
     //   const userProfile = await fb.default.database.ref('users/'+user.id))
 
